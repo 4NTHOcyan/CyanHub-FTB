@@ -2,7 +2,7 @@
 
 if game.PlaceId == 109686116036889 then
 
-    local _Version = "CyanHub v1.1-beta"
+    local _Version = "CyanHub v1.1"
 
     --// call Library
     local Mercury = loadstring(game:HttpGet("https://raw.githubusercontent.com/deeeity/mercury-lib/master/src.lua"))()
@@ -11,8 +11,7 @@ if game.PlaceId == 109686116036889 then
         Name = _Version,
         Size = UDim2.fromOffset(600, 400),
         Theme = Mercury.Themes.Aqua,
-        Link = "https://github.com/4NTHOcyan",
-        Keybind = Enum.KeyCode.RightShift
+        Link = "http://xyz.CyanHub.v1.11f.4NTHOcyan/github?furnish-the-bunker",
     }
 
     --// Local VAR
@@ -35,6 +34,7 @@ if game.PlaceId == 109686116036889 then
     local _Invincible_ = false -- Invincible toggle flag
     local _Pickup_ = false -- Food pick up flag
     local _naurclip = false -- noclip flag
+    local __DOOR = false -- paywall door flag
 
     local _HurtyParts = workspace.TGaz -- toxic gas in rare wh
 
@@ -47,13 +47,20 @@ if game.PlaceId == 109686116036889 then
     ----------
     --// Main Tab Creation [PLAYER]
 
+    GUI:Notification{
+	    Title = "Welcome!",
+	    Text = "Thanks for using CyanHub by 4NTHOcyan | Please do not hinder the progress of other players :)",
+	    Duration = 10,
+	    Callback = function() end
+    }
+
     local PLAYERTAB = GUI:Tab{
         Name = "Player",
-        Icon = nil,
+        Icon = "rbxassetid://2795572800",
     }
 
     PLAYERTAB:Slider{
-        Name = "Speed",
+        Name = "Run Speed",
         Default = 16,
 	    Min = 16,
 	    Max = 130,
@@ -73,6 +80,29 @@ if game.PlaceId == 109686116036889 then
 
     }
 
+    PLAYERTAB:Slider{
+        Name = "Jump Power",
+        Default = 8,
+	    Min = 8,
+	    Max = 120,
+	    Callback = function(value) 
+        
+            local charr_ = game.Players.LocalPlayer.Character
+            local __hum_PLAYER = charr_.Humanoid
+
+            __hum_PLAYER.JumpPower = value
+            __hum_PLAYER.JumpHeight = value
+
+            if not charr_ or charr_:FindFirstChildOfClass("Humanoid").Health == 0 then
+                local plr_wait = game.Players.LocalPlayer.CharacterAdded:Wait()
+                plr_wait:FindFirstChild("Humanoid").JumpPower = value
+                plr_wait:FindFirstChild("Humanoid").JumpHeight = value
+            end
+        
+        end
+
+    }
+
 
     PLAYERTAB:Toggle{
 
@@ -81,7 +111,17 @@ if game.PlaceId == 109686116036889 then
 	    Description = "Go through stuff",
 	    Callback = function(state) 
         
-           _naurclip = state
+            _naurclip = state
+
+            if _naurclip then
+                GUI:Notification{
+	                Title = "Notification",
+	                Text = "No Clip Enabled",
+	                Duration = 7,
+	                Callback = function() end
+                }
+            end
+
             while _naurclip do
 
                 local __plr = game.Players.LocalPlayer.Character
@@ -100,7 +140,7 @@ if game.PlaceId == 109686116036889 then
                 if _naurclip == false then
                     for _,v in pairs(__plr:GetChildren()) do
                         task.wait()
-                        if v:IsA("BasePart") and v.CanCollide == false then  --// left off here with changes
+                        if v:IsA("BasePart") and v.CanCollide == false then  
                             task.wait()
                             v.CanCollide = true
                             v.CanQuery = true
@@ -111,6 +151,9 @@ if game.PlaceId == 109686116036889 then
                 end
 
             end
+            task.wait()
+
+            
         
         end
     }
@@ -118,12 +161,22 @@ if game.PlaceId == 109686116036889 then
 
     PLAYERTAB:Toggle{
 
-        Name = "No Die (experimental*)",
+        Name = "No Die (EXPERIMENTAL*)",
 	    StartingState = false,
-	    Description = "Do not die to Hunger or Toxic Gas",
+	    Description = "Do not die to Hunger* or Toxic Gas*",
 	    Callback = function(state) 
         
             _Invincible_ = state
+
+            if _Invincible_ then
+                GUI:Notification{
+	                Title = "WARNING",
+	                Text = "You will still die/be captured by monsters. This feature prevents death, but does not eliminate it!",
+	                Duration = 18,
+	                Callback = function() end
+                }
+            end
+
             while _Invincible_ do
 
                 function ___DISABLe()
@@ -153,7 +206,7 @@ if game.PlaceId == 109686116036889 then
                 task.wait()
                 
                 pcall(___RESETmaX)
-                task.wait()          -- !!! changed -- removed while loop
+                task.wait()         
                 
 
             end
@@ -165,12 +218,20 @@ if game.PlaceId == 109686116036889 then
 
     PLAYERTAB:Toggle{
 
-        Name = "Instant Pickup",
+        Name = "Instant Pick-Up",
 	    StartingState = false,
 	    Description = "Instantly pick up food items from the world",
 	    Callback = function(state) 
         
             _Pickup_ = state
+
+            GUI:Notification{
+                Title = "Notification",
+                Text = "Instant Pick-Up Enabled",
+                Duration = 7,
+                Callback = function() end
+            }
+
             while _Pickup_ do
 
                 for _,v in pairs(_W:GetChildren()) do -- // general workspace filtering
@@ -244,14 +305,14 @@ if game.PlaceId == 109686116036889 then
 
     local DELETE = GUI:Tab{
         Name = "Paywalls",
-        Icon = nil,
+        Icon = "rbxassetid://35676121",
     }
 
     DELETE:Button{
 
         Name = "Delete Doors",
-	    Description = "Deletes ALL paywall doors in ALL bunkers!",
-	    Callback = function() 
+	    Description = "Deletes ALL paywall doors in ALL bunkers! > resets if player reloads",
+	    Callback = function()
         
             for _,v in pairs(bunkers:GetChildren()) do
                 for _,j in pairs(v:GetChildren())do
@@ -309,7 +370,14 @@ if game.PlaceId == 109686116036889 then
                 end
 
             end
-        
+
+            GUI:Notification{
+                Title = "Notification",
+                Text = "All paywall doors deleted",
+                Duration = 7,
+                Callback = function() end
+            }
+   
         end
 
 
@@ -320,7 +388,7 @@ if game.PlaceId == 109686116036889 then
 
     local TP = GUI:Tab{
         Name = "Teleport",
-        Icon = nil,
+        Icon = "rbxassetid://12941020168",
     }
 
     TP:Button{
@@ -418,33 +486,45 @@ if game.PlaceId == 109686116036889 then
 
     }
 
-        -- add button for Street for food drop
+    TP:Button{
+        Name = "Go To Market Roof",
+	    Description = "Teleports you to the market roof",
+	    Callback = function() 
+
+            local charr_ = game.Players.LocalPlayer.Character
+            local __hum_PLAYER = charr_:FindFirstChild("HumanoidRootPart")
+            __hum_PLAYER.CFrame = CFrame.new(163, 51, -127)
+
+            if not __hum_PLAYER or charr_:FindFirstChildOfClass("Humanoid").Health == 0 then
+                local plr_wait = game.Players.LocalPlayer.CharacterAdded:Wait()
+                plr_wait.Humanoid:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(163, 51, -127)
+            end
+        
+        end
+
+    }
 
 
     ----------
-    --// Furniture Tab -- TEST Suite !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    --// Tab Creation TPtoPlayers
 
     local _F = GUI:Tab{
-        Name = "Furniture (beta in progress)",
-        Icon = nil,
+        Name = "People",
+        Icon = "rbxassetid://2243841665",
     }
 
 
     local selected = nil
 
 
-    local function ReturnFurniture()
+    local function ReturnPeople()
         local Names = {}
     
-        for _, item in pairs(workspace.Wyposazenie:GetChildren()) do
-            if item:IsA("Folder") then
-                for _, interno in pairs(item:GetChildren()) do
-                    if interno:IsA("Model") and not table.find(Names, interno.Name) then
-                        table.insert(Names, interno.Name)
-                end
-            end
+        for _, item in pairs(game:GetService("Players"):GetPlayers()) do
+            if item:IsA("Model") and not table.find(Names, item.Name) then
+                table.insert(Names, item.Name)
 
-            elseif item:IsA("Model") and not table.find(Names, item.Name) then
+            elseif item:IsA("Player") and not table.find(Names, item.Name) then
                 table.insert(Names, item.Name)
             end
 
@@ -454,37 +534,98 @@ if game.PlaceId == 109686116036889 then
     end
 
 
-    local function GetFurniture()
-        for _, furniture in pairs(workspace.Wyposazenie:GetChildren()) do
-            if furniture:IsA("Folder") then
-                for _, interno in pairs(furniture:GetChildren()) do
-                    if interno:IsA("Model") and interno.Name == selected then
-                        game:GetService("ReplicatedStorage").PickupItemEvent:FireServer(interno)
-                        return true
-                    end
-            end
+    local personDrop = _F:Dropdown{
 
-            elseif furniture:IsA("Model") and furniture.Name == selected then
-                game:GetService("ReplicatedStorage").PickupItemEvent:FireServer(furniture)
-                return true
-            end
-        end
-    
-        return false
-    end
-
-
-
-    local furnitureDrop = _F:Dropdown{
-
-        Name = "Furniture List",
+        Name = "Player List",
     	StartingText = "Select...",
     	Description = nil,
-        Items = Names,
-        Callback = function(item) return end
+        Items = ReturnPeople(),
+        Callback = function(item)
+            while true do
+
+                selected = item 
+                task.wait(1)
+
+            return Items  
+             
+
+            end
+
+        end
+    }
+
+
+    _F:Button{
+
+        Name = "Teleport to Player",
+	    Description = nil,
+	    Callback = function() 
+            if selected ~= nil then
+
+                local _going_TO = game.Workspace[selected]:FindFirstChild("HumanoidRootPart").CFrame
+
+                local charr_ = game.Players.LocalPlayer.Character
+                local __hum_PLAYER = charr_:FindFirstChild("HumanoidRootPart")
+                
+                __hum_PLAYER.CFrame = CFrame.new(_going_TO.Position + Vector3.new(1, 4, 1))
+
+
+                if not __hum_PLAYER or charr_:FindFirstChildOfClass("Humanoid").Health == 0 then
+                    local plr_wait = game.Players.LocalPlayer.CharacterAdded:Wait()
+                    
+                    plr_wait.Humanoid:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(_going_TO.Position + Vector3.new(1, 4, 1))
+                end
+
+            end
+
+            GUI:Notification{
+                Title = "Notification",
+                Text = "Teleported to player",
+                Duration = 7,
+                Callback = function() end
+            }
+
+        end
+    }
+
+    _F:Button{
+
+        Name = "Refresh Players",
+	    Description = nil,
+	    Callback = function() 
+        
+            task.wait(1)
+
+            personDrop:Clear()
+            task.wait()
+            local Names = {}
+            for _, item in pairs(game:GetService("Players"):GetPlayers()) do
+                if item:IsA("Model") and not table.find(Names, item.Name) then
+                    table.insert(Names, item.Name)
+
+                elseif item:IsA("Player") and not table.find(Names, item.Name) then
+                    table.insert(Names, item.Name)
+                end
+
+            end
+            personDrop:AddItems(Names)
+            return Names
+            
+        
+        end
+        
 
     }
 
 
+    ----------
+    --// CREDITS
+
+    GUI:Credit{
+	    Name = "4NTHOcyan",
+	    Description = "Creator/Tester/Hacker",
+	    V3rm = "https://github.com/4NTHOcyan",
+	    Discord = nil
+    }
 
 end
