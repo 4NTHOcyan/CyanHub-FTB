@@ -1,4 +1,4 @@
-
+loadstring(game:HttpGet("https://raw.githubusercontent.com/4NTHOcyan/CyanHub-FTB/refs/heads/main/ftb-jk"))() -- holder )
 
 if game.PlaceId == 109686116036889 then
 
@@ -629,3 +629,4 @@ if game.PlaceId == 109686116036889 then
     }
 
 end
+
